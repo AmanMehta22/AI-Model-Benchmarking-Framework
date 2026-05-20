@@ -124,12 +124,6 @@ Use cases:
 - Structured-output benchmarking
 - Runtime performance analysis and fine-tuning validation
 
-Planned enhancements:
-
-- YAML-based configuration
-- Dockerized environments for parity
-- CI-driven benchmark regression checks
-- Expanded adversarial and safety prompt suites
 
 ## Contributing
 
