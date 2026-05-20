@@ -1,0 +1,56 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Logs
+*.log
+benchmark_run.log
+
+# Benchmark outputs
+results/
+
+# Model checkpoints and weights
+kcc_agent_checkpoints/
+*.pt
+*.pth
+*.safetensors
+*.bin
+
+# Virtual environments
+.venv/
+venv/
+env/
+my_env/
+
+# IDE/editor settings
+.vscode/
+.idea/
+
+# Environment variables / secrets
+.env
+
+# Databases
+*.sqlite
+*.db
+
+# Archives and distributions
+*.zip
+*.tar.gz
+*.tar
+*.tgz
+
+# Test / coverage
+.pytest_cache/
+coverage/
+htmlcov/
+
+# Distribution/build
+dist/
+build/
+*.egg-info/
+
+# macOS
+.DS_Store
+
+*.pdf
