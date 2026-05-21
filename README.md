@@ -1,6 +1,6 @@
 # AI Model Benchmarking Framework
 
-A local benchmarking and fine-tuning workspace for Kisan Call Center style agricultural Q&A and agentic tool-use evaluation. The repository includes a Hugging Face benchmark harness, a QLoRA training script, and a simple Ollama-backed CSV agent.
+A local benchmarking and fine-tuning workspace for Kisan Call Center style agricultural Q&A and agentic tool-use evaluation. The repository includes a Hugging Face benchmark harness, a QLoRA training script, and a trained-model inference helper.
 
 ## Table of contents
 
@@ -23,7 +23,7 @@ The current codebase has three main pieces:
 
 - `benchmark.py` runs a balanced 36-prompt suite against several Hugging Face instruction models and scores tool-use accuracy, restraint, JSON validity, latency, and throughput.
 - `train_kcc.py` prepares a QLoRA fine-tuning run for `Qwen/Qwen2.5-1.5B-Instruct` using `KCC_Call_Dataset.csv`.
-- `csv_agent.py` loads the CSV into a prompt and queries a local Ollama server at `http://localhost:11434/api/generate`.
+- `csv_agent.py` loads the trained KCC adapter and runs local inference directly from the fine-tuned model.
 
 Detailed methodology and the checked-in benchmark results are in `report.md`. Numeric exports are written to `results/` as timestamped CSV and JSON files.
 
@@ -35,7 +35,7 @@ Detailed methodology and the checked-in benchmark results are in `report.md`. Nu
 - Latency and throughput profiling
 - Support for Hugging Face models and local checkpoints
 - QLoRA fine-tuning scaffolding for the KCC dataset
-- Simple local Ollama integration for CSV-grounded Q&A
+- Simple local inference for the fine-tuned KCC assistant
 
 ## Metrics
 
@@ -130,7 +130,7 @@ Use cases:
 - Tool-calling research and validation
 - Structured-output benchmarking
 - Runtime performance analysis and fine-tuning validation
-- Local CSV-grounded agricultural assistant experiments
+- Local fine-tuned agricultural assistant experiments
 
 
 ## Contributing
