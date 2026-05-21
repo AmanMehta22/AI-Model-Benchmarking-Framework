@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-This report presents a comprehensive benchmarking analysis of 5 ultra-small to mid-sized language models (LLMs) evaluated on their ability to function as intelligent agents capable of tool-calling decision-making. The benchmark assesses critical agent capabilities: **action accuracy** (correctly identifying when to use tools), **restraint** (avoiding unnecessary tool calls), and **response validity** (producing parseable structured output).
+This report summarizes the checked-in benchmark run for 5 small to mid-sized language models evaluated on agent-style tool-calling decisions. The benchmark measures **action accuracy** (correctly identifying when to use tools), **restraint** (avoiding unnecessary tool calls), and **response validity** (producing parseable structured output).
 
 **Key Findings:**
 - Larger models (7B parameters) demonstrate significantly better tool-calling accuracy
@@ -47,7 +47,7 @@ Precision: bfloat16 (on GPU) / float32 (on CPU)
 | **Seed** | 42 | Reproducibility across runs |
 | **Device** | CUDA | GPU acceleration for fast inference |
 | **Compute Dtype** | bfloat16 | 50% memory reduction vs fp32 |
-| **Max Context Length** | 2048 tokens | Sufficient for test prompts |
+| **Max Context Length** | Model-dependent | The harness relies on each tokenizer/model pair |
 | **Max Generation** | 30 tokens | Tool decisions are brief (JSON) |
 | **Decoding Strategy** | Greedy (do_sample=False) | Deterministic results |
 | **KV Cache** | Enabled | 2-3x faster token generation |
@@ -58,7 +58,7 @@ Precision: bfloat16 (on GPU) / float32 (on CPU)
 
 ### 2.1 Framework Overview
 
-The **Professional Multi-Model Agent Benchmark Framework** is designed to evaluate LLMs on their ability to:
+The benchmark framework is designed to evaluate LLMs on their ability to:
 
 1. **Understand tool availability** - Recognize available functions in system prompt
 2. **Make tool decisions** - Determine when a tool is necessary vs. when to abstain
@@ -138,7 +138,7 @@ Only respond with valid JSON.
 - No-explanation rule prevents reasoning leakage
 - Clear binary choice (tool/none) simplifies decision-making
 
-### 3.2 Test Prompts: Tool-Use Category (10 prompts)
+### 3.2 Test Prompts: Tool-Use Category (9 prompts)
 
 Tests where the model MUST call a tool to provide adequate response.
 
@@ -148,15 +148,14 @@ Tests where the model MUST call a tool to provide adequate response.
 3. "Check if there are any precipitation alerts or severe weather updates active for Mumbai today." → `get_weather`
 4. "Look up the humidity levels and wind speed metrics for New Delhi right now." → `get_weather`
 
-#### File Search Queries (6 prompts)
+#### File Search Queries (5 prompts)
 5. "Search my local storage for files related to mustard crop reports." → `search_files`
 6. "Find PDF documents mentioning wheat disease treatment." → `search_files`
 7. "Could you browse my directory and pull up any spreadsheet or document discussing organic pest control methods?" → `search_files`
 8. "Scan through the local drive server to see if we have saved any files regarding tractor maintenance logs." → `search_files`
 9. "Please find the PDF manual that contains soil testing guidelines on my storage system." → `search_files`
-10. (Implicit 6th file search in category) → `search_files`
 
-### 3.3 Test Prompts: Restraint Category (8 prompts)
+### 3.3 Test Prompts: Restraint Category (9 prompts)
 
 Tests where the model should NOT call any tool—these are knowledge questions, opinions, or advice.
 
@@ -170,7 +169,7 @@ Tests where the model should NOT call any tool—these are knowledge questions, 
 8. "Explain how drip irrigation conserves more water compared to surface flood irrigation protocols." → `none` (explanation)
 
 **Test Suite Rationale:**
-- Balance: 10 tool-use vs 8 restraint tests (56% / 44%)
+- Balance: 9 tool-use vs 9 restraint tests (50% / 50%)
 - Domain: Agricultural focus (crop reports, weather for farming, irrigation)
 - Complexity: Ranging from direct queries to indirect suggestions
 - Phrasing Variety: Prevents overfitting to specific language patterns
@@ -331,20 +330,20 @@ Calculate Throughput = tokens_generated / (latency_ms / 1000)
 
 ## 6. Results & Analysis
 
-> The following table shows representative results (replace with actual benchmark output files in `results/`).
+The checked-in benchmark output in `results/agent_benchmark_results_20260520_091620.csv` contains the following results:
 
-| Rank | Model | Agent Score | Action Score | Restraint Score | Valid Response Rate | Wrong Tool Calls | Avg Latency (ms) | Throughput (tok/s) |
-|------|-------|-------------|--------------|-----------------|---------------------|------------------|------------------:|-------------------:|
-| 1 | Mistral-7B | 0.825 | 0.900 | 0.875 | 1.000 | 2 | 45.32 | 88.2 |
-| 2 | Qwen2.5-3B | 0.758 | 0.800 | 0.750 | 0.944 | 3 | 52.18 | 76.5 |
-| 3 | Qwen2.5-1.5B | 0.692 | 0.700 | 0.625 | 0.889 | 4 | 38.45 | 92.3 |
-| 4 | LFM-2.5-1.2B | 0.638 | 0.600 | 0.625 | 0.833 | 5 | 41.22 | 85.7 |
-| 5 | Qwen2.5-0.5B | 0.545 | 0.500 | 0.500 | 0.722 | 7 | 28.15 | 112.5 |
+| Rank | Model | Agent Score | Action Score | Restraint Score | Valid Response Rate | Wrong Tool Calls | Invalid Responses | Avg Latency (ms) | Throughput (tok/s) |
+|------|-------|-------------|--------------|-----------------|---------------------|------------------|------------------|------------------:|-------------------:|
+| 1 | Qwen2.5-3B | 0.944 | 0.889 | 1.000 | 1.000 | 1 | 0 | 6043.63 | 1.23 |
+| 2 | LFM-2.5-1.2B | 0.872 | 1.000 | 0.667 | 0.944 | 2 | 1 | 3595.45 | 2.47 |
+| 3 | Qwen2.5-1.5B | 0.828 | 1.000 | 0.556 | 0.944 | 3 | 1 | 4874.01 | 1.84 |
+| 4 | Mistral-7B | 0.767 | 0.778 | 0.667 | 0.889 | 3 | 2 | 38459.07 | 0.59 |
+| 5 | Qwen2.5-0.5B | 0.622 | 1.000 | 0.000 | 0.778 | 5 | 4 | 14581.79 | 0.81 |
 
 **Key Insights:**
-- Larger models generally have higher agent scores and better JSON compliance.
-- Restraint remains a challenging capability; models tend to over-call tools.
-- Latency and throughput trade off against accuracy; choose models per use-case.
+- `Qwen2.5-3B` achieved the best overall agent score in this run.
+- Smaller models were not uniformly worse on action, but restraint varied more sharply.
+- Latency and throughput still depend on model size and hardware placement.
 
 ---
 
@@ -352,21 +351,22 @@ Calculate Throughput = tokens_generated / (latency_ms / 1000)
 
 ### Size vs. Performance Correlation
 
-Model size shows a clear positive trend with agent capability; larger models have higher action and restraint scores, though latency increases.
+Model size is not the only factor in this run. `Qwen2.5-3B` performed best overall, while `LFM-2.5-1.2B` had the fastest throughput and `Mistral-7B` had the highest latency.
 
 ### Speed vs. Accuracy Trade-off
 
-- Mistral-7B balances accuracy and latency well and is recommended for production agent systems.
-- Smaller models (0.5B) are fast but suffer from hallucination and format issues.
+- `LFM-2.5-1.2B` was the fastest model in the recorded output.
+- `Mistral-7B` was the slowest model in the recorded output.
+- `Qwen2.5-0.5B` had the weakest restraint score.
 
 ---
 
 ## 8. Recommendations & Conclusions
 
-- Use **Mistral-7B** for production agent systems when accuracy and reliable tool-calling are required.
-- Use **Qwen2.5-1.5B** or **Qwen2.5-3B** for lower-latency or cost-sensitive deployments with monitoring.
-- Fine-tune smaller models with additional restraint and JSON-format examples to improve performance.
-- Add output validation (JSON schema check) before invoking actual tools in production.
+- Use the recorded benchmark results as a baseline, not as a deployment guarantee.
+- Treat `Qwen2.5-3B` as the strongest model in this specific run.
+- Treat `LFM-2.5-1.2B` as the strongest throughput option in this specific run.
+- Add output validation before invoking actual tools in production.
 
 ---
 

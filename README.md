@@ -1,8 +1,6 @@
-git clone https://github.com/AmanMehta22/AI-Model-Benchmarking-Framework.git
----
 # AI Model Benchmarking Framework
 
-A reproducible evaluation framework for benchmarking Large Language Models (LLMs) on agent-oriented behaviors, including tool-use decision making, structured output reliability, restraint handling, and runtime efficiency. This repository provides a professional and extensible harness for engineers and researchers to compare models on agentic workloads.
+A local benchmarking and fine-tuning workspace for Kisan Call Center style agricultural Q&A and agentic tool-use evaluation. The repository includes a Hugging Face benchmark harness, a QLoRA training script, and a simple Ollama-backed CSV agent.
 
 ## Table of contents
 
@@ -21,9 +19,13 @@ A reproducible evaluation framework for benchmarking Large Language Models (LLMs
 
 ## Overview
 
-As LLMs are integrated into agentic systems, evaluation must address behavioral correctness and runtime characteristics. This framework focuses on three behavioral axes (action, restraint, validity) and system performance (latency, throughput), enabling repeatable comparisons across model families and sizes.
+The current codebase has three main pieces:
 
-Detailed methodology and baseline findings are provided in `report.md`. Numeric exports are written to the `results/` directory as timestamped CSV and JSON files.
+- `benchmark.py` runs a prompt suite against several Hugging Face instruction models and scores tool-use accuracy, restraint, JSON validity, latency, and throughput.
+- `train_kcc.py` prepares a QLoRA fine-tuning run for `Qwen/Qwen2.5-1.5B-Instruct` using `KCC_Call_Dataset.csv`.
+- `csv_agent.py` loads the CSV into a prompt and queries a local Ollama server at `http://localhost:11434/api/generate`.
+
+Detailed methodology and the checked-in benchmark results are in `report.md`. Numeric exports are written to `results/` as timestamped CSV and JSON files.
 
 ## Capabilities
 
@@ -32,7 +34,8 @@ Detailed methodology and baseline findings are provided in `report.md`. Numeric 
 - JSON validity checks and robust parsing
 - Latency and throughput profiling
 - Support for Hugging Face models and local checkpoints
-- Lightweight design for rapid iteration and extension
+- QLoRA fine-tuning scaffolding for the KCC dataset
+- Simple local Ollama integration for CSV-grounded Q&A
 
 ## Metrics
 
@@ -48,7 +51,7 @@ Detailed methodology and baseline findings are provided in `report.md`. Numeric 
 
 ## Methodology
 
-The benchmark uses a curated prompt suite and a strict system prompt that enumerates available tools and enforces JSON-only responses. Prompts are categorized into `tool_use` (requires tool invocation) and `restraint` (should return `{"tool": "none"}`). Outputs are parsed and validated; metrics are aggregated per model and exported.
+The benchmark uses a curated prompt suite and a strict system prompt that enumerates available tools and enforces JSON-only responses. Prompts are categorized into `tool_use` and `restraint`, and the harness parses outputs, validates tool names, and aggregates metrics per model before exporting CSV and JSON results.
 
 ## Quickstart
 
@@ -91,9 +94,9 @@ AI-Model-Benchmarking-Framework/
 
 Running `benchmark.py` performs the following steps for each model:
 
-1. Load tokenizer and model (Hugging Face hub or local checkpoint)
+1. Load tokenizer and model from Hugging Face or a local checkpoint
 2. Warm up inference to stabilize GPU kernels
-3. Execute the test suite (tool_use + restraint prompts)
+3. Execute the test suite
 4. Parse model outputs for JSON decisions
 5. Aggregate metrics and write CSV/JSON reports to `results/`
 
@@ -109,6 +112,10 @@ Generated artifacts:
 - Tokenization helpers include support for `apply_chat_template` with fallbacks for compatibility.
 - Timing uses `time.perf_counter()` with `torch.cuda.synchronize()` before and after generation to provide accurate GPU timings.
 
+## Current caveat
+
+`csv_agent.py` currently expects CSV columns named `question` and `answer`, while `KCC_Call_Dataset.csv` uses `questions` and `answers`. The training script uses the correct column names, but the CSV agent needs a small fix before it can run successfully.
+
 ## Reproducibility recommendations
 
 - Pin CUDA, driver, and PyTorch versions when possible.
@@ -123,6 +130,7 @@ Use cases:
 - Tool-calling research and validation
 - Structured-output benchmarking
 - Runtime performance analysis and fine-tuning validation
+- Local CSV-grounded agricultural assistant experiments
 
 
 ## Contributing
