@@ -1,67 +1,80 @@
-import pandas as pd
-import json
-import urllib.request
+import os
 
-# 1. Load your dataset
-# Assumes columns are named 'question' and 'answer'
-try:
-    df = pd.read_csv("KCC_Call_Dataset.csv")
-    # Convert CSV to a compact string format the model can read easily
-    csv_context = ""
-    for idx, row in df.iterrows():
-        csv_context += f"Q: {row['question']}\nA: {row['answer']}\n---\n"
-except Exception as e:
-    print(f"Error loading CSV file: {e}")
-    exit()
+import torch
+from peft import PeftModel
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
-def query_csv_agent(user_query, model_name="phi4-mini:3.8b"):
-    url = "http://localhost:11434/api/generate"
-    
-    # Construct a strong system prompt embedding the entire CSV document
-    system_prompt = f"""
-    You are an advanced, high-precision AI Knowledge Agent. 
-    Below is an absolute ground-truth database containing verified Question-and-Answer pairs.
-    Use ONLY this data to answer the user's prompt. If the answer cannot be inferred from the database, 
-    politely state that you do not have that information.
 
-    === GROUND TRUTH DATABASE ===
-    {csv_context}
-    ============================
-    """
-    
-    # We combine system behavior instructions with the user query
-    full_prompt = f"{system_prompt}\n\nUser Question: {user_query}\nAgent Answer:"
-    
-    data = {
-        "model": model_name,
-        "prompt": full_prompt,
-        "options": {
-            "num_ctx": 32768  # Expand Ollama's memory window to fit the data easily
-        },
-        "stream": False
-    }
-    
-    req = urllib.request.Request(
-        url, 
-        data=json.dumps(data).encode('utf-8'), 
-        headers={'Content-Type': 'application/json'}
-    )
-    
-    try:
-        with urllib.request.urlopen(req) as response:
-            res = json.loads(response.read().decode('utf-8'))
-            return res.get('response', '').strip()
-    except Exception as e:
-        return f"Error connecting to agent backend: {e}"
+BASE_MODEL = "Qwen/Qwen2.5-1.5B-Instruct"
+ADAPTER_DIR = "./my_kcc_agent"
 
-# Example interactive loop inside the cluster
+
+def load_model():
+    tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
+    tokenizer.pad_token = tokenizer.eos_token
+
+    if torch.cuda.is_available():
+        quantization_config = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_compute_dtype=torch.bfloat16,
+            bnb_4bit_use_double_quant=True,
+        )
+
+        base_model = AutoModelForCausalLM.from_pretrained(
+            BASE_MODEL,
+            quantization_config=quantization_config,
+            torch_dtype=torch.bfloat16,
+            device_map="auto",
+        )
+    else:
+        base_model = AutoModelForCausalLM.from_pretrained(
+            BASE_MODEL,
+            torch_dtype=torch.float32,
+        )
+
+    if not os.path.isdir(ADAPTER_DIR):
+        raise FileNotFoundError(
+            f"Trained adapter not found at {ADAPTER_DIR}. Run train_kcc.py first."
+        )
+
+    model = PeftModel.from_pretrained(base_model, ADAPTER_DIR)
+    model.eval()
+    return tokenizer, model
+
+
+def query_trained_agent(user_query, tokenizer, model):
+    messages = [
+        {"role": "system", "content": "You are a Kisan Call Center agricultural expert agent. Answer directly from the trained model."},
+        {"role": "user", "content": user_query},
+    ]
+
+    prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    inputs = tokenizer(prompt, return_tensors="pt")
+    inputs = {k: v.to(model.device) for k, v in inputs.items()}
+
+    with torch.no_grad():
+        output = model.generate(
+            **inputs,
+            max_new_tokens=256,
+            do_sample=False,
+            pad_token_id=tokenizer.pad_token_id,
+            eos_token_id=tokenizer.eos_token_id,
+            use_cache=True,
+        )
+
+    generated_tokens = output[0][inputs["input_ids"].shape[1]:]
+    return tokenizer.decode(generated_tokens, skip_special_tokens=True).strip()
+
+
 if __name__ == "__main__":
-    print("🤖 CSV Knowledge Agent Initialized on NVIDIA H200.")
+    print("🤖 Trained KCC agent initialized.")
+    tokenizer, model = load_model()
+
     while True:
-        user_input = input("\nAsk the agent something (or type 'exit'): ")
-        if user_input.lower() == 'exit':
+        user_input = input("\nAsk the agent something (or type 'exit'): ").strip()
+        if user_input.lower() == "exit":
             break
-        
-        # Phi-4-mini or Qwen3:4b are excellent choices for strict context adherence
-        reply = query_csv_agent(user_input, model_name="phi4-mini:3.8b")
+
+        reply = query_trained_agent(user_input, tokenizer, model)
         print(f"\nResponse:\n{reply}")
