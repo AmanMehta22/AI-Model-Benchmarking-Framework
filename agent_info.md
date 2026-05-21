@@ -5,7 +5,7 @@ This repository contains a small benchmarking and fine-tuning setup for Kisan Ca
 
 ## What the code does
 
-- `benchmark.py` evaluates a set of Hugging Face instruction models on 18 prompts that test tool-use decisions, restraint, JSON validity, latency, and throughput.
+- `benchmark.py` evaluates a set of Hugging Face instruction models on a balanced 36-prompt suite that tests tool-use decisions, restraint, JSON validity, latency, and throughput.
 - `train_kcc.py` prepares a QLoRA-style fine-tuning run for `Qwen/Qwen2.5-1.5B-Instruct` using the local CSV dataset.
 - `csv_agent.py` sends the full CSV content to a local Ollama server at `http://localhost:11434/api/generate` with `num_ctx = 32768`.
 

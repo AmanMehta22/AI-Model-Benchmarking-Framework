@@ -66,141 +66,75 @@ MODELS = {
 }
 
 # =========================================================
-# TEST SUITE
+# BALANCED TEST SUITE
 # =========================================================
 
 TEST_PROMPTS = [
-    {
-        "id": 1,
-        "category": "tool_use",
-        "prompt": "Check the weather forecast for New Delhi.",
-        "expected_tool": "get_weather"
-    },
-    {
-        "id": 2,
-        "category": "tool_use",
-        "prompt": "Search my local storage for files related to mustard crop reports.",
-        "expected_tool": "search_files"
-    },
-    {
-        "id": 3,
-        "category": "restraint",
-        "prompt": "The weather looks pleasant today. Should I go for a walk?",
-        "expected_tool": None
-    },
-    {
-        "id": 4,
-        "category": "restraint",
-        "prompt": "Write a short note on agricultural automation.",
-        "expected_tool": None
-    },
-    {
-        "id": 5,
-        "category": "tool_use",
-        "prompt": "Find PDF documents mentioning wheat disease treatment.",
-        "expected_tool": "search_files"
-    },
-    {
-        "id": 6,
-        "category": "restraint",
-        "prompt": "Explain the importance of irrigation systems.",
-        "expected_tool": None
-    },
-    {
-        "id": 7,
-        "category": "tool_use",
-        "prompt": "Could you browse my directory and pull up any spreadsheet or document discussing organic pest control methods?",
-        "expected_tool": "search_files"
-    },
-    {
-        "id": 8,
-        "category": "tool_use",
-        "prompt": "I am traveling to Ranchi tomorrow morning. Can you pull up the live atmospheric conditions and forecast for that region?",
-        "expected_tool": "get_weather"
-    },
-    {
-        "id": 9,
-        "category": "tool_use",
-        "prompt": "Scan through the local drive server to see if we have saved any files regarding tractor maintenance logs.",
-        "expected_tool": "search_files"
-    },
-    {
-        "id": 10,
-        "category": "tool_use",
-        "prompt": "Check if there are any precipitation alerts or severe weather updates active for Mumbai today.",
-        "expected_tool": "get_weather"
-    },
-    {
-        "id": 11,
-        "category": "tool_use",
-        "prompt": "Please find the PDF manual that contains soil testing guidelines on my storage system.",
-        "expected_tool": "search_files"
-    },
-    {
-        "id": 12,
-        "category": "tool_use",
-        "prompt": "Look up the humidity levels and wind speed metrics for New Delhi right now.",
-        "expected_tool": "get_weather"
-    },
-    {
-        "id": 13,
-        "category": "restraint",
-        "prompt": "Farming practices have shifted over the last century. What are the key differences between traditional and modern agriculture?",
-        "expected_tool": "none"
-    },
-    {
-        "id": 14,
-        "category": "restraint",
-        "prompt": "It has been raining continuously for three days here. Do you think this will cause waterlogging in my field?",
-        "expected_tool": "none"
-    },
-    {
-        "id": 15,
-        "category": "restraint",
-        "prompt": "Can you summarize the biological process of photosynthesis in simple terms for a student?",
-        "expected_tool": "none"
-    },
-    {
-        "id": 16,
-        "category": "restraint",
-        "prompt": "My crops are turning slightly yellow. Should I consider adding more nitrogen-based fertilizer next week?",
-        "expected_tool": "none"
-    },
-    {
-        "id": 17,
-        "category": "restraint",
-        "prompt": "Explain how drip irrigation conserves more water compared to surface flood irrigation protocols.",
-        "expected_tool": "none"
-    },
-    {
-        "id": 18,
-        "category": "restraint",
-        "prompt": "Draft an introductory paragraph for a research paper analyzing sustainable farming patterns in Asia.",
-        "expected_tool": "none"
-    }
+    # --- WEATHER TOOL SELECTION (Prompts 1-12) ---
+    {"id": 1, "category": "tool_use", "prompt": "Check the weather forecast for New Delhi.", "expected_tool": "get_weather"},
+    {"id": 2, "category": "tool_use", "prompt": "I am traveling to Ranchi tomorrow morning. Can you pull up the live atmospheric conditions and forecast for that region?", "expected_tool": "get_weather"},
+    {"id": 3, "category": "tool_use", "prompt": "Check if there are any precipitation alerts or severe weather updates active for Mumbai today.", "expected_tool": "get_weather"},
+    {"id": 4, "category": "tool_use", "prompt": "Look up the humidity levels and wind speed metrics for New Delhi right now.", "expected_tool": "get_weather"},
+    {"id": 5, "category": "tool_use", "prompt": "What is the expected rainfall pattern for Punjab over the next 48 hours?", "expected_tool": "get_weather"},
+    {"id": 6, "category": "tool_use", "prompt": "Is there a ground frost warning active for Haryana fields tonight?", "expected_tool": "get_weather"},
+    {"id": 7, "category": "tool_use", "prompt": "Pull up the live ambient temperature and moisture index for Patna right now.", "expected_tool": "get_weather"},
+    {"id": 8, "category": "tool_use", "prompt": "Check the current wind direction and storm speed parameters for coastal Odisha.", "expected_tool": "get_weather"},
+    {"id": 9, "category": "tool_use", "prompt": "What are the atmospheric climate readings for Nagpur agricultural zones currently?", "expected_tool": "get_weather"},
+    {"id": 10, "category": "tool_use", "prompt": "Are there any active heatwave advisories issued for Rajasthan districts today?", "expected_tool": "get_weather"},
+    {"id": 11, "category": "tool_use", "prompt": "Fetch the humidity index and dew point forecast for Hyderabad over this weekend.", "expected_tool": "get_weather"},
+    {"id": 12, "category": "tool_use", "prompt": "Please extract the live radar rainfall metrics for the Chennai farming perimeter.", "expected_tool": "get_weather"},
+
+    # --- SEARCH_FILES TOOL SELECTION (Prompts 13-24) ---
+    {"id": 13, "category": "tool_use", "prompt": "Search my local storage for files related to mustard crop reports.", "expected_tool": "search_files"},
+    {"id": 14, "category": "tool_use", "prompt": "Find PDF documents mentioning wheat disease treatment.", "expected_tool": "search_files"},
+    {"id": 15, "category": "tool_use", "prompt": "Could you browse my directory and pull up any spreadsheet discussing organic pest control methods?", "expected_tool": "search_files"},
+    {"id": 16, "category": "tool_use", "prompt": "Scan through the local drive server to see if we have saved any files regarding tractor maintenance logs.", "expected_tool": "search_files"},
+    {"id": 17, "category": "tool_use", "prompt": "Please find the PDF manual that contains soil testing guidelines on my storage system.", "expected_tool": "search_files"},
+    {"id": 18, "category": "tool_use", "prompt": "Search inside the folder system for advisory files covering aphid infestation rogor spray dosage.", "expected_tool": "search_files"},
+    {"id": 19, "category": "tool_use", "prompt": "Locate any word document matching coconut flower drop treatment schedule parameters.", "expected_tool": "search_files"},
+    {"id": 20, "category": "tool_use", "prompt": "Check my local files for early ahu rice variety sourcing logs from ATIC Jorhat.", "expected_tool": "search_files"},
+    {"id": 21, "category": "tool_use", "prompt": "Find the excel sheet listing standard fertilizer ratios for sali crop configurations.", "expected_tool": "search_files"},
+    {"id": 22, "category": "tool_use", "prompt": "Pull up the text file detailing biomanure preparation training contacts in my registry.", "expected_tool": "search_files"},
+    {"id": 23, "category": "tool_use", "prompt": "Search local storage files for cauliflower damping off saaf treatment protocols.", "expected_tool": "search_files"},
+    {"id": 24, "category": "tool_use", "prompt": "Locate a file named kisan_credit_card_sbi_recovery_guidelines inside my folders.", "expected_tool": "search_files"},
+
+    # --- RESTRAINT / TRAP SELECTION (Prompts 25-36) ---
+    {"id": 25, "category": "restraint", "prompt": "The weather looks pleasant today. Should I go for a walk?", "expected_tool": "none"},
+    {"id": 26, "category": "restraint", "prompt": "Write a short note on agricultural automation.", "expected_tool": "none"},
+    {"id": 27, "category": "restraint", "prompt": "Explain the importance of irrigation systems.", "expected_tool": "none"},
+    {"id": 28, "category": "restraint", "prompt": "Farming practices have shifted over the last century. What are the key differences between traditional and modern agriculture?", "expected_tool": "none"},
+    {"id": 29, "category": "restraint", "prompt": "It has been raining continuously for three days here. Do you think this will cause waterlogging in my field?", "expected_tool": "none"},
+    {"id": 30, "category": "restraint", "prompt": "Can you summarize the biological process of photosynthesis in simple terms for a student?", "expected_tool": "none"},
+    {"id": 31, "category": "restraint", "prompt": "My crops are turning slightly yellow. Should I consider adding more nitrogen-based fertilizer next week?", "expected_tool": "none"},
+    {"id": 32, "category": "restraint", "prompt": "Explain how drip irrigation conserves more water compared to surface flood irrigation protocols.", "expected_tool": "none"},
+    {"id": 33, "category": "restraint", "prompt": "Draft an introductory paragraph for a research paper analyzing sustainable farming patterns in Asia.", "expected_tool": "none"},
+    {"id": 34, "category": "restraint", "prompt": "Historically, how did ancient civilizations predict weather variations before the invention of modern meteorological tools?", "expected_tool": "none"},
+    {"id": 35, "category": "restraint", "prompt": "I need help understanding how filing systems work. Can you explain the difference between a physical filing cabinet and cloud storage?", "expected_tool": "none"},
+    {"id": 36, "category": "restraint", "prompt": "Give me a step-by-step checklist on how to properly organize agricultural files inside a computer system manually.", "expected_tool": "none"}
 ]
 
 # =========================================================
 # SYSTEM PROMPT
 # =========================================================
 
-SYSTEM_PROMPT = """You are an AI agent with access to tools.
+SYSTEM_PROMPT = """You are a strict routing agent with access to tools.
 
 Available tools:
 1. get_weather - Get current weather information for a location
 2. search_files - Search local storage for files matching a query
 
 Rules:
-- If a tool is required, respond ONLY in JSON format:
-  {"tool": "tool_name"}
+- If the user asks for live weather, forecasts, alerts, or atmospheric conditions, use get_weather.
+- If the user asks to scan, search, browse, locate, or find local files or folders, use search_files.
+- If neither tool is needed, respond with none.
+- Return exactly one JSON object and nothing else.
 
-- If no tool is required, respond:
-  {"tool": "none"}
+Output format:
+{"tool": "get_weather"}
+{"tool": "search_files"}
+{"tool": "none"}
 
-DO NOT explain.
-DO NOT generate extra text.
-DO NOT add any text before or after the JSON.
-Only respond with valid JSON."""
+Do not explain or add extra text."""
 
 # =========================================================
 # RESPONSE PARSER

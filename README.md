@@ -21,7 +21,7 @@ A local benchmarking and fine-tuning workspace for Kisan Call Center style agric
 
 The current codebase has three main pieces:
 
-- `benchmark.py` runs a prompt suite against several Hugging Face instruction models and scores tool-use accuracy, restraint, JSON validity, latency, and throughput.
+- `benchmark.py` runs a balanced 36-prompt suite against several Hugging Face instruction models and scores tool-use accuracy, restraint, JSON validity, latency, and throughput.
 - `train_kcc.py` prepares a QLoRA fine-tuning run for `Qwen/Qwen2.5-1.5B-Instruct` using `KCC_Call_Dataset.csv`.
 - `csv_agent.py` loads the CSV into a prompt and queries a local Ollama server at `http://localhost:11434/api/generate`.
 
@@ -51,7 +51,7 @@ Detailed methodology and the checked-in benchmark results are in `report.md`. Nu
 
 ## Methodology
 
-The benchmark uses a curated prompt suite and a strict system prompt that enumerates available tools and enforces JSON-only responses. Prompts are categorized into `tool_use` and `restraint`, and the harness parses outputs, validates tool names, and aggregates metrics per model before exporting CSV and JSON results.
+The benchmark uses a balanced curated prompt suite and a strict system prompt that enumerates available tools and enforces JSON-only responses. Prompts are categorized into `tool_use` and `restraint`, and the harness parses outputs, validates tool names, and aggregates metrics per model before exporting CSV and JSON results.
 
 ## Quickstart
 

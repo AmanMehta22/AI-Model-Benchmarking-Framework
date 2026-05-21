@@ -138,24 +138,28 @@ Only respond with valid JSON.
 - No-explanation rule prevents reasoning leakage
 - Clear binary choice (tool/none) simplifies decision-making
 
-### 3.2 Test Prompts: Tool-Use Category (9 prompts)
+### 3.2 Test Prompts: Tool-Use Category
+
+The current benchmark definition includes 24 tool-use prompts. The examples below are representative prompts from that set.
 
 Tests where the model MUST call a tool to provide adequate response.
 
-#### Weather Queries (4 prompts)
+#### Weather Queries (12 prompts)
 1. "Check the weather forecast for New Delhi." → `get_weather`
 2. "I am traveling to Ranchi tomorrow morning. Can you pull up the live atmospheric conditions and forecast for that region?" → `get_weather`
 3. "Check if there are any precipitation alerts or severe weather updates active for Mumbai today." → `get_weather`
 4. "Look up the humidity levels and wind speed metrics for New Delhi right now." → `get_weather`
 
-#### File Search Queries (5 prompts)
+#### File Search Queries (12 prompts)
 5. "Search my local storage for files related to mustard crop reports." → `search_files`
 6. "Find PDF documents mentioning wheat disease treatment." → `search_files`
 7. "Could you browse my directory and pull up any spreadsheet or document discussing organic pest control methods?" → `search_files`
 8. "Scan through the local drive server to see if we have saved any files regarding tractor maintenance logs." → `search_files`
 9. "Please find the PDF manual that contains soil testing guidelines on my storage system." → `search_files`
 
-### 3.3 Test Prompts: Restraint Category (9 prompts)
+### 3.3 Test Prompts: Restraint Category
+
+The current benchmark definition includes 12 restraint prompts. The examples below are representative prompts from that set.
 
 Tests where the model should NOT call any tool—these are knowledge questions, opinions, or advice.
 
@@ -169,8 +173,8 @@ Tests where the model should NOT call any tool—these are knowledge questions, 
 8. "Explain how drip irrigation conserves more water compared to surface flood irrigation protocols." → `none` (explanation)
 
 **Test Suite Rationale:**
-- Balance: 9 tool-use vs 9 restraint tests (50% / 50%)
-- Domain: Agricultural focus (crop reports, weather for farming, irrigation)
+- Balance: 12 weather + 12 file search + 12 restraint prompts
+- Domain: Agricultural focus (crop reports, weather for farming, irrigation, and local file lookup)
 - Complexity: Ranging from direct queries to indirect suggestions
 - Phrasing Variety: Prevents overfitting to specific language patterns
 
@@ -229,7 +233,7 @@ Tests where the model should NOT call any tool—these are knowledge questions, 
 
 ### 5.1 Inference Pipeline
 
-For each model and each of 18 test prompts:
+For each model and each of 36 test prompts:
 
 ```
 1. Load Tokenizer
@@ -330,7 +334,7 @@ Calculate Throughput = tokens_generated / (latency_ms / 1000)
 
 ## 6. Results & Analysis
 
-The checked-in benchmark output in `results/agent_benchmark_results_20260520_091620.csv` contains the following results:
+The checked-in benchmark output in `results/agent_benchmark_results_20260520_091620.csv` is kept as a historical baseline from the earlier 18-prompt run. The current `benchmark.py` now uses a 36-prompt suite.
 
 | Rank | Model | Agent Score | Action Score | Restraint Score | Valid Response Rate | Wrong Tool Calls | Invalid Responses | Avg Latency (ms) | Throughput (tok/s) |
 |------|-------|-------------|--------------|-----------------|---------------------|------------------|------------------|------------------:|-------------------:|
@@ -339,7 +343,9 @@ The checked-in benchmark output in `results/agent_benchmark_results_20260520_091
 | 3 | Qwen2.5-1.5B | 0.828 | 1.000 | 0.556 | 0.944 | 3 | 1 | 4874.01 | 1.84 |
 | 4 | Mistral-7B | 0.767 | 0.778 | 0.667 | 0.889 | 3 | 2 | 38459.07 | 0.59 |
 | 5 | Qwen2.5-0.5B | 0.622 | 1.000 | 0.000 | 0.778 | 5 | 4 | 14581.79 | 0.81 |
-
+<p align="center">
+  <img src="image-1.png" width="800">
+</p>
 **Key Insights:**
 - `Qwen2.5-3B` achieved the best overall agent score in this run.
 - Smaller models were not uniformly worse on action, but restraint varied more sharply.
