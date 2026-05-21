@@ -54,3 +54,11 @@ build/
 .DS_Store
 
 *.pdf
+
+#img
+*.img
+*.png
+*.jpg
+*.jpeg
+*.bmp
+*.gif
